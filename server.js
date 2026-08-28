@@ -35,6 +35,11 @@ app.get('/api/rates', async (_req, res) => {
   res.json(publicState());
 });
 
+app.get('/api/update', async (_req, res) => {
+  try { res.json(await updateRates(true)); }
+  catch (error) { res.status(502).json({ success: false, ...publicState(), error: error.message }); }
+});
+
 app.post('/api/update', async (_req, res) => {
   try { res.json(await updateRates(true)); }
   catch (error) { res.status(502).json({ success: false, ...publicState(), error: error.message }); }
