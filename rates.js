@@ -4,84 +4,87 @@ const RATE_KEYS = [
   'CNY', 'KRW', 'THB', 'AED'
 ];
 
+function cleanNumber(value) {
+  let s = String(value ?? '').trim().replace(',', '.');
+  s = s.replace(/[^0-9.]/g, '');
+  // OCR can produce more than one decimal dot. Keep the first and remove the rest.
+  const parts = s.split('.');
+  if (parts.length > 2) s = parts.shift() + '.' + parts.join('');
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 function normalizeOcr(text) {
   return String(text || '')
     .replace(/\u00A0/g, ' ')
     .replace(/[，]/g, ',')
     .replace(/[：]/g, ':')
     .replace(/[–—]/g, '-')
-    .replace(/[Оо]/g, '0')
-    .replace(/[Зз]/g, '3')
-    .replace(/[Аа]/g, 'A')
-    .replace(/[ІіLl]/g, '1')
     .replace(/\r/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function round6(value) { return Number(Number(value).toFixed(6)); }
-function valid(value, max = 100000) { return Number.isFinite(value) && value > 0 && value < max; }
-
-function valuesAfterEquals(text) {
-  const normalized = normalizeOcr(text).replace(/,/g, '.');
-  return [...normalized.matchAll(/=\s*(\d+(?:\.\d+)?)/g)]
-    .map(m => Number(m[1]))
-    .filter(n => valid(n, 10000));
+function valid(value, min = 0, max = 100000) {
+  return Number.isFinite(value) && value > min && value < max;
 }
 
-function matchNumber(text, regex, max = 10000) {
-  const m = normalizeOcr(text).replace(/,/g, '.').match(regex);
-  if (!m) return null;
-  const n = Number(m[1]);
-  return valid(n, max) ? n : null;
+// Converts common OCR variants where the decimal point was lost.
+// Example: 2360 -> 23.60, 274 -> 2.74, 5690 -> 56.90.
+function repairDecimal(raw, kind) {
+  const n = cleanNumber(raw);
+  if (n == null) return null;
+
+  const ranges = {
+    KRW: { min: 1, max: 100 },
+    AED: { min: 1, max: 100 },
+    USD: { min: 1, max: 200 },
+    JPY: { min: 1, max: 100 },
+    CNY: { min: 1, max: 50 },
+    THB: { min: 0.1, max: 20 }
+  };
+  const r = ranges[kind];
+  if (!r) return n;
+
+  if (n > r.max && n < r.max * 100) {
+    const x = n / 100;
+    if (x > r.min && x < r.max) return round6(x);
+  }
+  if (n >= 100 && n < 1000) {
+    const x = n / 100;
+    if (x > r.min && x < r.max) return round6(x);
+  }
+  if (n >= 10 && kind === 'THB') {
+    // 274 -> 2.74 is especially common for this card.
+    const x = n / 100;
+    if (x > 0.1 && x < 20) return round6(x);
+  }
+  return n;
 }
 
 function parseRates(_regions = {}, rawText = '') {
   const text = normalizeOcr(rawText).replace(/,/g, '.');
   const result = {};
 
-  // Label-aware extraction when OCR preserved the label.
-  const krw = matchNumber(text, /1000\s*KRW\s*=\s*(\d+(?:\.\d+)?)/i, 1000);
-  if (krw != null) result.KRW = round6(krw / 1000);
+  const values = [...text.matchAll(/=\s*([0-9OolI.,]{1,12})/g)]
+    .map(m => cleanNumber(m[1]))
+    .filter(n => n != null);
 
-  const aed = matchNumber(text, /1\s*A[EЕ]D\s*=\s*(\d+(?:\.\d+)?)/i, 1000);
-  if (aed != null) result.AED = round6(aed);
-
-  const thb = matchNumber(text, /1\s*THB\s*=\s*(\d+(?:\.\d+)?)/i, 100);
-  if (thb != null) result.THB = round6(thb);
-
-  const cny = matchNumber(text, /1\s*(?:CNY|VON)\s*=\s*(\d+(?:\.\d+)?)/i, 100);
-  if (cny != null) result.CNY = round6(cny);
-
-  const usd = [...text.matchAll(/(?:1\s*)?USD\s*=\s*(\d+(?:\.\d+)?)/gi)]
-    .map(m => Number(m[1])).filter(n => valid(n, 1000));
-  if (usd[0] != null) result.USD_SWIFT = round6(usd[0]);
-  if (usd[1] != null) result.USD_IDUBID = round6(usd[1]);
-
-  const jpy = [...text.matchAll(/100\s*JPY\s*=\s*(\d+(?:\.\d+)?)/gi)]
-    .map(m => Number(m[1])).filter(n => valid(n, 1000));
-  if (jpy[0] != null) result.JPY_INTERNAL = round6(jpy[0] / 100);
-  if (jpy[1] != null) result.JPY_SWIFT = round6(jpy[1] / 100);
-
-  // Fixed layout fallback. It is intentionally based on the values after "=";
-  // Tesseract commonly damages the left-hand currency label but keeps the number.
-  const eq = valuesAfterEquals(text);
-  if (eq.length >= 10) {
-    result.KRW = round6(eq[0] / 1000);
-    result.AED = round6(eq[1]);
-    result.USD_SWIFT = round6(eq[2]);
-    result.JPY_INTERNAL = round6(eq[3] / 100);
-    result.JPY_SWIFT = round6(eq[4] / 100);
-    result.CNY = round6(eq[5]);
-    result.THB = round6(eq[6]);
-    result.USD_IDUBID = round6(eq[7]);
-    result.JPY_CASH = round6(eq[8] / 100);
-    result.JPY_QR = round6(eq[9] / 100);
-  } else {
-    const looseJpy = [...text.matchAll(/JPY\s*=\s*(\d+(?:\.\d+)?)/gi)]
-      .map(m => Number(m[1])).filter(n => valid(n, 1000));
-    if (result.JPY_CASH == null && looseJpy[0] != null) result.JPY_CASH = round6(looseJpy[0] / 100);
-    if (result.JPY_QR == null && looseJpy[1] != null) result.JPY_QR = round6(looseJpy[1] / 100);
+  // Fixed card order. This is only a fallback; the primary parser uses the
+  // image coordinates in ocr.js so damaged labels cannot shift the fields.
+  if (values.length >= 10) {
+    result.KRW = Number((repairDecimal(values[0], 'KRW') / 1000).toFixed(6));
+    result.AED = repairDecimal(values[1], 'AED');
+    result.USD_SWIFT = repairDecimal(values[2], 'USD');
+    result.JPY_INTERNAL = repairDecimal(values[3], 'JPY') / 100;
+    result.JPY_SWIFT = repairDecimal(values[4], 'JPY') / 100;
+    result.CNY = repairDecimal(values[5], 'CNY');
+    result.THB = repairDecimal(values[6], 'THB');
+    result.USD_IDUBID = repairDecimal(values[7], 'USD');
+    result.JPY_CASH = repairDecimal(values[8], 'JPY') / 100;
+    result.JPY_QR = repairDecimal(values[9], 'JPY') / 100;
   }
 
   if (result.JPY_CASH != null) result.JPY_AFA_CASH = result.JPY_CASH;
@@ -90,5 +93,18 @@ function parseRates(_regions = {}, rawText = '') {
   return result;
 }
 
-function hasCoreRates(rates) { return RATE_KEYS.every(key => Number.isFinite(rates[key])); }
-module.exports = { RATE_KEYS, parseRates, hasCoreRates, normalizeOcr };
+function hasCoreRates(rates) {
+  return RATE_KEYS.every(key => Number.isFinite(rates[key])) &&
+    rates.KRW > 0 && rates.KRW < 0.2 &&
+    rates.AED > 1 && rates.AED < 100 &&
+    rates.USD_SWIFT > 1 && rates.USD_SWIFT < 200 &&
+    rates.USD_IDUBID > 1 && rates.USD_IDUBID < 200 &&
+    rates.JPY_INTERNAL > 0.01 && rates.JPY_INTERNAL < 1 &&
+    rates.JPY_SWIFT > 0.01 && rates.JPY_SWIFT < 1 &&
+    rates.JPY_CASH > 0.01 && rates.JPY_CASH < 1 &&
+    rates.JPY_QR > 0.01 && rates.JPY_QR < 1 &&
+    rates.CNY > 1 && rates.CNY < 50 &&
+    rates.THB > 0.1 && rates.THB < 20;
+}
+
+module.exports = { RATE_KEYS, parseRates, hasCoreRates, normalizeOcr, cleanNumber, repairDecimal };
