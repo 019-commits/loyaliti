@@ -1,0 +1,4019 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    CalcCardash.ru — Расчёт растаможки авто
+</title>
+
+<style>
+
+:root{
+    --bg:#070a0f;
+    --bg2:#0b1017;
+    --card:#111821;
+    --input:#0d131b;
+    --border:#202b38;
+    --text:#f5f7fa;
+    --muted:#8e9aaa;
+    --cyan:#00eaff;
+    --blue:#008cff;
+    --green:#00e58a;
+    --red:#ff5263;
+    --yellow:#ffc857;
+    --shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    padding:24px;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    color:var(--text);
+
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(0,234,255,.09),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(0,140,255,.08),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            var(--bg),
+            var(--bg2)
+        );
+}
+
+body:before{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.018) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.018) 1px,
+            transparent 1px
+        );
+
+    background-size:40px 40px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 80%
+        );
+}
+
+.container{
+    width:100%;
+    max-width:1250px;
+    margin:auto;
+
+    position:relative;
+    z-index:1;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+    text-align:center;
+    margin:20px 0 35px;
+}
+
+.logo{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    color:var(--cyan);
+
+    font-size:15px;
+    font-weight:800;
+
+    letter-spacing:2px;
+    text-transform:uppercase;
+
+    margin-bottom:15px;
+}
+
+.logo-dot{
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:var(--cyan);
+
+    box-shadow:
+        0 0 10px var(--cyan),
+        0 0 25px var(--cyan);
+}
+
+h1{
+    font-size:clamp(2rem,5vw,3.7rem);
+    line-height:1;
+
+    font-weight:900;
+    letter-spacing:-2px;
+
+    margin-bottom:14px;
+}
+
+h1 span{
+    color:var(--cyan);
+
+    text-shadow:
+        0 0 30px
+        rgba(0,234,255,.35);
+}
+
+.subtitle{
+    color:var(--muted);
+    font-size:1rem;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.main-grid{
+    display:grid;
+
+    grid-template-columns:
+        minmax(0,1.05fr)
+        minmax(0,.95fr);
+
+    gap:22px;
+}
+
+@media(max-width:950px){
+
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card{
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,28,39,.94),
+            rgba(11,16,23,.94)
+        );
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+    backdrop-filter:blur(15px);
+}
+
+.card-header{
+
+    padding:22px 24px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:15px;
+}
+
+.card-title{
+    font-size:1.15rem;
+    font-weight:850;
+}
+
+.card-subtitle{
+    color:var(--muted);
+    font-size:.8rem;
+    margin-top:4px;
+}
+
+.card-body{
+    padding:24px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    padding:7px 11px;
+
+    border-radius:999px;
+
+    font-size:.75rem;
+    font-weight:800;
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    background:
+        rgba(255,255,255,.035);
+
+    white-space:nowrap;
+}
+
+.status:before{
+
+    content:"";
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:var(--yellow);
+
+    box-shadow:
+        0 0 8px var(--yellow);
+}
+
+.status.success{
+
+    color:var(--green);
+
+    border-color:
+        rgba(0,229,138,.25);
+
+    background:
+        rgba(0,229,138,.06);
+}
+
+.status.success:before{
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 9px var(--green);
+}
+
+.status.error{
+
+    color:var(--red);
+
+    border-color:
+        rgba(255,82,99,.25);
+
+    background:
+        rgba(255,82,99,.06);
+}
+
+.status.error:before{
+
+    background:var(--red);
+
+    box-shadow:
+        0 0 9px var(--red);
+}
+
+.status.loading{
+    animation:pulse 1.3s infinite;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group{
+    margin-bottom:19px;
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    color:#b7c0cc;
+
+    font-size:.82rem;
+    font-weight:650;
+}
+
+input,
+select{
+
+    width:100%;
+
+    min-height:48px;
+
+    padding:12px 14px;
+
+    color:var(--text);
+
+    background:var(--input);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:11px;
+
+    font-size:.94rem;
+
+    transition:.2s;
+}
+
+input:hover,
+select:hover{
+    border-color:#334354;
+}
+
+input:focus,
+select:focus{
+
+    outline:none;
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0,234,255,.08),
+
+        0 0 20px
+        rgba(0,234,255,.05);
+}
+
+input::placeholder{
+    color:#526070;
+}
+
+.row{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:14px;
+}
+
+@media(max-width:550px){
+
+    .row{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+}
+
+.input-with-select{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 145px;
+
+    gap:8px;
+}
+
+@media(max-width:550px){
+
+    .input-with-select{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.calculate{
+
+    width:100%;
+
+    min-height:57px;
+
+    margin-top:7px;
+
+    border:0;
+
+    border-radius:13px;
+
+    cursor:pointer;
+
+    color:#001013;
+
+    font-size:1rem;
+    font-weight:900;
+
+    background:
+        linear-gradient(
+            110deg,
+            #00eaff,
+            #00c8df 45%,
+            #008cff
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,205,255,.18),
+
+        inset 0 1px 0
+        rgba(255,255,255,.4);
+
+    transition:.2s;
+}
+
+.calculate:hover{
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(0,205,255,.25),
+
+        inset 0 1px 0
+        rgba(255,255,255,.4);
+}
+
+.calculate:active{
+    transform:translateY(0);
+}
+
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+.telegram{
+
+    border:
+        1px solid
+        rgba(0,136,204,.3);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,136,204,.11),
+            rgba(0,136,204,.035)
+        );
+
+    border-radius:15px;
+
+    padding:16px;
+
+    margin-bottom:18px;
+}
+
+.telegram-top{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+}
+
+.telegram-title{
+    font-weight:850;
+}
+
+.telegram-description{
+
+    margin-top:6px;
+
+    color:var(--muted);
+
+    font-size:.78rem;
+
+    line-height:1.5;
+}
+
+.telegram-button{
+
+    border:0;
+
+    background:#0088cc;
+
+    color:white;
+
+    padding:10px 14px;
+
+    border-radius:9px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    white-space:nowrap;
+}
+
+.telegram-button:hover{
+
+    background:#009ce8;
+
+    transform:
+        translateY(-1px);
+}
+
+.telegram-button:disabled{
+
+    opacity:.6;
+
+    cursor:wait;
+}
+
+
+/* =========================================================
+   RATE
+========================================================= */
+
+.current-rate{
+
+    padding:18px;
+
+    border-radius:15px;
+
+    border:
+        1px solid
+        rgba(0,234,255,.35);
+
+    background:
+
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(0,234,255,.1),
+            transparent 40%
+        ),
+
+        #0b1118;
+
+    margin-bottom:18px;
+}
+
+.rate-caption{
+
+    color:var(--muted);
+
+    font-size:.75rem;
+
+    margin-bottom:7px;
+}
+
+.rate-big{
+
+    font-size:1.7rem;
+
+    font-weight:900;
+
+    color:var(--cyan);
+}
+
+.rate-source{
+
+    margin-top:7px;
+
+    color:#728092;
+
+    font-size:.75rem;
+}
+
+.rates-title{
+
+    margin:21px 0 10px;
+
+    font-size:.9rem;
+
+    font-weight:850;
+}
+
+.rates-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:8px;
+}
+
+.rate-item{
+
+    padding:12px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        rgba(255,255,255,.025);
+
+    border-radius:10px;
+}
+
+.rate-name{
+
+    color:var(--muted);
+
+    font-size:.72rem;
+
+    margin-bottom:4px;
+}
+
+.rate-number{
+
+    font-weight:850;
+
+    font-size:.94rem;
+}
+
+@media(max-width:500px){
+
+    .rates-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
+
+.info{
+
+    margin-top:18px;
+
+    padding:13px 14px;
+
+    border-left:
+        3px solid
+        var(--cyan);
+
+    border-radius:9px;
+
+    background:
+        rgba(0,234,255,.035);
+
+    color:var(--muted);
+
+    font-size:.77rem;
+
+    line-height:1.55;
+}
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+.results{
+
+    margin-top:22px;
+
+    display:none;
+}
+
+.results.visible{
+    display:block;
+}
+
+.total{
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    background:
+
+        radial-gradient(
+            circle at 50% 0,
+            rgba(0,234,255,.1),
+            transparent 55%
+        );
+}
+
+.total-label{
+
+    color:var(--muted);
+
+    text-transform:uppercase;
+
+    letter-spacing:1.3px;
+
+    font-size:.72rem;
+
+    font-weight:750;
+}
+
+.total-value{
+
+    margin-top:10px;
+
+    color:var(--cyan);
+
+    font-size:
+        clamp(2.3rem,6vw,4rem);
+
+    font-weight:950;
+
+    letter-spacing:-2px;
+
+    text-shadow:
+        0 0 30px
+        rgba(0,234,255,.22);
+}
+
+.results-body{
+    padding:24px;
+}
+
+.details{
+
+    display:grid;
+
+    gap:0;
+}
+
+.detail{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:14px 0;
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+.detail-name{
+
+    color:var(--muted);
+
+    font-size:.85rem;
+}
+
+.detail-value{
+
+    font-size:.9rem;
+
+    font-weight:850;
+
+    text-align:right;
+}
+
+.section{
+
+    margin:25px 0 8px;
+
+    color:var(--cyan);
+
+    font-size:.9rem;
+
+    font-weight:900;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+}
+
+.error-box{
+
+    margin:20px 24px 0;
+
+    padding:13px 15px;
+
+    border-radius:10px;
+
+    color:var(--red);
+
+    background:
+        rgba(255,82,99,.07);
+
+    border:
+        1px solid
+        rgba(255,82,99,.2);
+
+    font-size:.85rem;
+
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+
+    text-align:center;
+
+    color:#526070;
+
+    font-size:.72rem;
+
+    margin:28px 0 10px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+@keyframes pulse{
+
+    50%{
+        opacity:.45;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<header class="header">
+
+    <div class="logo">
+
+        <span class="logo-dot"></span>
+
+        CALCCARDASH.RU
+
+    </div>
+
+
+    <h1>
+
+        Расчёт
+        <span>растаможки</span>
+
+    </h1>
+
+
+    <p class="subtitle">
+
+        Калькулятор стоимости автомобиля
+        с актуальными курсами Telegram
+
+    </p>
+
+</header>
+
+
+<div class="main-grid">
+
+
+<!-- =====================================================
+     АВТОМОБИЛЬ
+===================================================== -->
+
+<section class="card">
+
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="card-title">
+                Параметры автомобиля
+            </div>
+
+            <div class="card-subtitle">
+                Данные для расчёта таможенных платежей
+            </div>
+
+        </div>
+
+
+        <span class="status success">
+            2026
+        </span>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <div class="form-group">
+
+            <label>
+                Страна / способ оплаты
+            </label>
+
+
+            <select id="priceCurrency">
+
+                <option value="JPY_INTERNAL">
+                    🇯🇵 Япония (JPY) — Внутренний перевод
+                </option>
+
+                <option value="JPY_SWIFT">
+                    🇯🇵 Япония (JPY) — SWIFT
+                </option>
+
+                <option value="JPY_CASH">
+                    🇯🇵 Япония (JPY) — AFA Trading (Наличные)
+                </option>
+
+                <option value="JPY_QR">
+                    🇯🇵 Япония (JPY) — AFA Trading (QR)
+                </option>
+
+                <option value="CNY">
+                    🇨🇳 Китай (CNY)
+                </option>
+
+                <option value="KRW">
+                    🇰🇷 Южная Корея (KRW)
+                </option>
+
+                <option value="THB">
+                    🇹🇭 Таиланд (THB)
+                </option>
+
+                <option value="AED">
+                    🇦🇪 ОАЭ (AED)
+                </option>
+
+                <option value="USD_SWIFT">
+                    🇺🇸 USD — SWIFT
+                </option>
+
+                <option value="USD_IDUBID">
+                    🇺🇸 USD — IDUBID
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Тип владельца
+            </label>
+
+            <select id="ownerType">
+
+                <option value="phys">
+                    Физическое лицо
+                </option>
+
+                <option value="legal">
+                    Юридическое лицо
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Тип транспортного средства
+            </label>
+
+            <select id="engineType">
+
+                <option value="petrol">
+                    ДВС — бензин
+                </option>
+
+                <option value="diesel">
+                    ДВС — дизель
+                </option>
+
+                <option value="hybrid">
+                    Гибрид
+                </option>
+
+                <option value="series_hybrid">
+                    Последовательный гибрид
+                </option>
+
+                <option value="ev">
+                    Электромобиль
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+
+            <div class="form-group">
+
+                <label>
+                    Цена автомобиля
+                </label>
+
+                <input
+                    id="price"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="Например: 2500000"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Год выпуска
+                </label>
+
+                <input
+                    id="year"
+                    type="number"
+                    min="1900"
+                    max="2026"
+                    placeholder="2023"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+
+            <div class="form-group">
+
+                <label>
+                    Объём двигателя, см³
+                </label>
+
+                <input
+                    id="volume"
+                    type="number"
+                    min="0"
+                    placeholder="1490"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Мощность, л.с.
+                </label>
+
+                <input
+                    id="power"
+                    type="number"
+                    min="0"
+                    placeholder="150"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Возраст автомобиля
+            </label>
+
+            <select id="ageGroup">
+
+                <option value="less_3">
+                    Меньше 3-х лет
+                </option>
+
+                <option value="3_5">
+                    3–5 лет
+                </option>
+
+                <option value="5_7">
+                    5–7 лет
+                </option>
+
+                <option value="more_7">
+                    Больше 7 лет
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Автомобиль старше 30 лет и является историческим?
+            </label>
+
+            <select id="classic">
+
+                <option value="no">
+                    Нет
+                </option>
+
+                <option value="yes">
+                    Да
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="calculate"
+            id="calculateBtn"
+            type="button"
+            onclick="calculate()"
+        >
+
+            Рассчитать стоимость
+
+        </button>
+
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     КУРСЫ
+===================================================== -->
+
+<section class="card">
+
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="card-title">
+                Курсы и расходы
+            </div>
+
+            <div class="card-subtitle">
+                Курсы получаются с Telegram-сервера
+            </div>
+
+        </div>
+
+
+        <span
+            id="rateStatus"
+            class="status loading"
+        >
+            Загрузка
+        </span>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <div class="telegram">
+
+
+            <div class="telegram-top">
+
+
+                <div>
+
+                    <div class="telegram-title">
+                        📱 Telegram
+                    </div>
+
+
+                    <div
+                        id="telegramStatus"
+                        class="telegram-description"
+                    >
+
+                        Подключение к серверу...
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="telegram-button"
+                    id="telegramButton"
+                    type="button"
+                    onclick="loadTelegramRates()"
+                >
+
+                    Обновить
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="current-rate">
+
+
+            <div class="rate-caption">
+
+                Текущий курс — RUB
+                за 1 единицу валюты
+
+            </div>
+
+
+            <div
+                id="carRate"
+                class="rate-big"
+            >
+
+                —
+
+            </div>
+
+
+            <div
+                id="rateSource"
+                class="rate-source"
+            >
+
+                Источник: —
+
+            </div>
+
+
+        </div>
+
+
+        <div class="rates-title">
+            Полученные курсы
+        </div>
+
+
+        <div class="rates-grid">
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    USD SWIFT
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateUSD"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    USD IDUBID
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateUSDID"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    JPY SWIFT
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateJPYSWIFT"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    JPY Internal
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateJPY"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    JPY AFA Cash
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateJPYCASH"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    JPY AFA QR
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateJPYQR"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    KRW
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateKRW"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    AED
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateAED"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    CNY
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateCNY"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rate-item">
+
+                <div class="rate-name">
+                    THB
+                </div>
+
+                <div
+                    class="rate-number"
+                    id="rateTHB"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            class="form-group"
+            style="margin-top:20px"
+        >
+
+            <label>
+                Ручной курс USD
+            </label>
+
+            <input
+                id="manualUSD"
+                type="number"
+                step="0.01"
+                placeholder="Если пусто — Telegram"
+            >
+
+            <div class="telegram-description">
+
+                Если поле заполнено,
+                для USD используется указанный курс.
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Комиссия компании
+            </label>
+
+
+            <div class="input-with-select">
+
+
+                <input
+                    id="commission"
+                    type="number"
+                    value="50000"
+                    min="0"
+                >
+
+
+                <select id="commissionCurrency">
+
+                    <option value="RUB">
+                        RUB
+                    </option>
+
+                    <option value="USD_SWIFT">
+                        USD
+                    </option>
+
+                    <option value="JPY_INTERNAL">
+                        JPY
+                    </option>
+
+                    <option value="CNY">
+                        CNY
+                    </option>
+
+                    <option value="KRW">
+                        KRW
+                    </option>
+
+                    <option value="AED">
+                        AED
+                    </option>
+
+                    <option value="THB">
+                        THB
+                    </option>
+
+                </select>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Фрахт
+            </label>
+
+
+            <div class="input-with-select">
+
+
+                <input
+                    id="freight"
+                    type="number"
+                    value="250"
+                    min="0"
+                >
+
+
+                <select id="freightCurrency">
+
+                    <option value="USD_SWIFT">
+                        USD
+                    </option>
+
+                    <option value="RUB">
+                        RUB
+                    </option>
+
+                    <option value="JPY_INTERNAL">
+                        JPY
+                    </option>
+
+                    <option value="CNY">
+                        CNY
+                    </option>
+
+                    <option value="KRW">
+                        KRW
+                    </option>
+
+                    <option value="AED">
+                        AED
+                    </option>
+
+                    <option value="THB">
+                        THB
+                    </option>
+
+                </select>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                СВХ и брокер
+            </label>
+
+
+            <div class="input-with-select">
+
+
+                <input
+                    id="svh"
+                    type="number"
+                    value="70000"
+                    min="0"
+                >
+
+
+                <select id="svhCurrency">
+
+                    <option value="RUB">
+                        RUB
+                    </option>
+
+                    <option value="USD_SWIFT">
+                        USD
+                    </option>
+
+                    <option value="JPY_INTERNAL">
+                        JPY
+                    </option>
+
+                    <option value="CNY">
+                        CNY
+                    </option>
+
+                    <option value="KRW">
+                        KRW
+                    </option>
+
+                    <option value="AED">
+                        AED
+                    </option>
+
+                    <option value="THB">
+                        THB
+                    </option>
+
+                </select>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="info">
+
+            <b>Источник курсов:</b>
+
+            Telegram → Render → API → калькулятор.
+
+            <br><br>
+
+            JPY сервер отдаёт как стоимость
+            <b>за 100 JPY</b>.
+
+            Например:
+
+            <b>55,90 ₽ / 100 JPY</b>.
+
+            Калькулятор автоматически переводит
+            это в <b>0,559 ₽ / 1 JPY</b>.
+
+            <br><br>
+
+            KRW сервер отдаёт за
+            <b>1000 KRW</b>.
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+</div>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<section
+    id="results"
+    class="card results"
+>
+
+
+    <div id="errorBox"></div>
+
+
+    <div class="total">
+
+        <div class="total-label">
+            Итоговая стоимость
+        </div>
+
+
+        <div
+            id="total"
+            class="total-value"
+        >
+
+            0 ₽
+
+        </div>
+
+    </div>
+
+
+    <div class="results-body">
+
+        <div
+            id="details"
+            class="details"
+        ></div>
+
+    </div>
+
+
+</section>
+
+
+<footer class="footer">
+
+    CalcCardash.ru • Расчёт стоимости автомобиля
+
+</footer>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   API
+========================================================= */
+
+/*
+   ЭТО ГЛАВНОЕ.
+
+   Сервер реально имеет этот endpoint:
+
+   https://curs-auto.onrender.com/api/rates
+*/
+
+const API_URL =
+    "/api/rates";
+
+
+/* =========================================================
+   FALLBACK
+========================================================= */
+
+const FALLBACK_RATES = {
+
+    JPY_INTERNAL:0.5530,
+
+    JPY_SWIFT:0.5530,
+
+    JPY_CASH:0.5580,
+
+    JPY_QR:0.5580,
+
+    CNY:13.15,
+
+    KRW:0.0636,
+
+    THB:2.70,
+
+    AED:23.50,
+
+    USD_SWIFT:87.20,
+
+    USD_IDUBID:88.70
+
+};
+
+
+let RATES = {
+    ...FALLBACK_RATES
+};
+
+
+let ratesFromAPI = false;
+
+
+/* =========================================================
+   NORMALIZE RATE
+========================================================= */
+
+function normalizeRate(
+    value,
+    currency
+){
+
+    const n = Number(value);
+
+
+    if(
+        !Number.isFinite(n) ||
+        n <= 0
+    ){
+
+        return 0;
+
+    }
+
+
+    /*
+       JPY.
+
+       API:
+
+       55.9 = ₽ / 100 JPY
+
+       В калькуляторе:
+
+       0.559 = ₽ / 1 JPY
+    */
+
+    if(
+        currency.startsWith("JPY")
+    ){
+
+        if(n > 10){
+
+            return n / 100;
+
+        }
+
+        return n;
+
+    }
+
+
+    /*
+       KRW.
+
+       API:
+
+       63.6 = ₽ / 1000 KRW
+
+       В калькуляторе:
+
+       0.0636 = ₽ / 1 KRW
+    */
+
+    if(currency === "KRW"){
+
+        if(n > 1){
+
+            return n / 1000;
+
+        }
+
+        return n;
+
+    }
+
+
+    return n;
+
+}
+
+
+/* =========================================================
+   SAFE NUMBER
+========================================================= */
+
+function validRate(
+    value,
+    fallback
+){
+
+    const n = Number(value);
+
+
+    if(
+        Number.isFinite(n) &&
+        n > 0
+    ){
+
+        return n;
+
+    }
+
+
+    return fallback;
+
+}
+
+
+/* =========================================================
+   LOAD TELEGRAM RATES
+========================================================= */
+
+async function loadTelegramRates(){
+
+    const status =
+        document.getElementById(
+            "rateStatus"
+        );
+
+
+    const telegramStatus =
+        document.getElementById(
+            "telegramStatus"
+        );
+
+
+    const button =
+        document.getElementById(
+            "telegramButton"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Загрузка...";
+
+
+    status.textContent =
+        "Загрузка";
+
+    status.className =
+        "status loading";
+
+
+    telegramStatus.textContent =
+        "Получаем актуальные курсы с Render API...";
+
+
+    try{
+
+
+        /*
+           Таймаут 15 секунд.
+
+           Если Render долго просыпается,
+           сайт не зависает навсегда.
+        */
+
+        const controller =
+            new AbortController();
+
+
+        const timeout =
+            setTimeout(
+                () => {
+                    controller.abort();
+                },
+                15000
+            );
+
+
+        /*
+           Timestamp полностью отключает
+           использование старого cache.
+        */
+
+        const url =
+            API_URL +
+            "?t=" +
+            Date.now();
+
+
+        console.log(
+            "Запрос курсов:",
+            url
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method:"GET",
+
+                    mode:"cors",
+
+                    cache:"no-store",
+
+                    credentials:"omit",
+
+                    headers:{
+                        "Accept":
+                            "application/json"
+                    },
+
+                    signal:
+                        controller.signal
+                }
+            );
+
+
+        clearTimeout(timeout);
+
+
+        console.log(
+            "HTTP статус API:",
+            response.status
+        );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Полный ответ API:",
+            data
+        );
+
+
+        /*
+           Проверяем API.
+        */
+
+        if(
+            !data ||
+            data.success !== true ||
+            !data.rates ||
+            typeof data.rates !== "object"
+        ){
+
+            throw new Error(
+                "API вернул неправильный формат"
+            );
+
+        }
+
+
+        const r =
+            data.rates;
+
+
+        console.log(
+            "Полученные rates:",
+            r
+        );
+
+
+        /* =================================================
+           USD
+        ================================================= */
+
+        RATES.USD_SWIFT =
+            validRate(
+
+                normalizeRate(
+                    r.USD ??
+                    r.USD_SWIFT,
+                    "USD_SWIFT"
+                ),
+
+                FALLBACK_RATES.USD_SWIFT
+
+            );
+
+
+        RATES.USD_IDUBID =
+            validRate(
+
+                normalizeRate(
+                    r.USD_IDUBID,
+                    "USD_IDUBID"
+                ),
+
+                FALLBACK_RATES.USD_IDUBID
+
+            );
+
+
+        /* =================================================
+           JPY SWIFT
+        ================================================= */
+
+        RATES.JPY_SWIFT =
+            validRate(
+
+                normalizeRate(
+                    r.JPY_SWIFT ??
+                    r.JPY,
+                    "JPY_SWIFT"
+                ),
+
+                FALLBACK_RATES.JPY_SWIFT
+
+            );
+
+
+        /* =================================================
+           JPY INTERNAL
+        ================================================= */
+
+        RATES.JPY_INTERNAL =
+            validRate(
+
+                normalizeRate(
+                    r.JPY_INTERNAL ??
+                    r.JPY ??
+                    r.JPY_SWIFT,
+                    "JPY_INTERNAL"
+                ),
+
+                FALLBACK_RATES.JPY_INTERNAL
+
+            );
+
+
+        /* =================================================
+           JPY AFA CASH
+
+           Серверное имя:
+
+           JPY_AFA_CASH
+        ================================================= */
+
+        const afaCash =
+            normalizeRate(
+                r.JPY_AFA_CASH ??
+                r.JPY_AFA ??
+                r.JPY_CASH,
+                "JPY_CASH"
+            );
+
+
+        /*
+           Если сервер реально прислал значение —
+           используем его.
+
+           Если null —
+           используем fallback.
+        */
+
+        RATES.JPY_CASH =
+            validRate(
+                afaCash,
+                FALLBACK_RATES.JPY_CASH
+            );
+
+
+        /* =================================================
+           JPY AFA QR
+        ================================================= */
+
+        const afaQR =
+            normalizeRate(
+                r.JPY_AFA_QR ??
+                r.JPY_QR,
+                "JPY_QR"
+            );
+
+
+        RATES.JPY_QR =
+            validRate(
+                afaQR,
+                FALLBACK_RATES.JPY_QR
+            );
+
+
+        /* =================================================
+           CNY
+        ================================================= */
+
+        RATES.CNY =
+            validRate(
+
+                normalizeRate(
+                    r.CNY,
+                    "CNY"
+                ),
+
+                FALLBACK_RATES.CNY
+
+            );
+
+
+        /* =================================================
+           KRW
+        ================================================= */
+
+        RATES.KRW =
+            validRate(
+
+                normalizeRate(
+                    r.KRW,
+                    "KRW"
+                ),
+
+                FALLBACK_RATES.KRW
+
+            );
+
+
+        /* =================================================
+           AED
+        ================================================= */
+
+        RATES.AED =
+            validRate(
+
+                normalizeRate(
+                    r.AED,
+                    "AED"
+                ),
+
+                FALLBACK_RATES.AED
+
+            );
+
+
+        /* =================================================
+           THB
+        ================================================= */
+
+        RATES.THB =
+            validRate(
+
+                normalizeRate(
+                    r.THB,
+                    "THB"
+                ),
+
+                FALLBACK_RATES.THB
+
+            );
+
+
+        ratesFromAPI = true;
+
+
+        console.log(
+            "ИТОГОВЫЕ КУРСЫ:",
+            RATES
+        );
+
+
+        /* =================================================
+           STATUS SUCCESS
+        ================================================= */
+
+        status.textContent =
+            "Telegram ✓";
+
+        status.className =
+            "status success";
+
+
+        telegramStatus.innerHTML =
+            "✅ Курсы успешно получены с сервера";
+
+
+        if(data.updatedAt){
+
+            telegramStatus.innerHTML +=
+                "<br>Обновлено: " +
+                escapeHtml(
+                    formatDate(
+                        data.updatedAt
+                    )
+                );
+
+        }
+
+
+        if(data.postId){
+
+            telegramStatus.innerHTML +=
+                "<br>Telegram post: " +
+                escapeHtml(
+                    String(
+                        data.postId
+                    )
+                );
+
+        }
+
+
+        /*
+           Обновляем интерфейс.
+        */
+
+        updateRatesUI();
+
+        updateCarRate();
+
+
+    }catch(error){
+
+
+        console.error(
+            "ОШИБКА API:",
+            error
+        );
+
+
+        ratesFromAPI = false;
+
+
+        status.textContent =
+            "Резервные курсы";
+
+        status.className =
+            "status error";
+
+
+        let message =
+            "Не удалось получить курсы.";
+
+
+        if(
+            error &&
+            error.name === "AbortError"
+        ){
+
+            message =
+                "Сервер Render не ответил за 15 секунд.";
+
+        }else if(
+            error &&
+            error.message
+        ){
+
+            message =
+                error.message;
+
+        }
+
+
+        telegramStatus.innerHTML =
+            "⚠️ " +
+            escapeHtml(message) +
+            "<br>Используются резервные курсы.";
+
+
+        /*
+           Возвращаем fallback.
+        */
+
+        RATES = {
+            ...FALLBACK_RATES
+        };
+
+
+        updateRatesUI();
+
+        updateCarRate();
+
+
+    }finally{
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Обновить";
+
+    }
+
+}
+
+
+/* =========================================================
+   FORMAT DATE
+========================================================= */
+
+function formatDate(
+    value
+){
+
+    const date =
+        new Date(value);
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return String(value);
+
+    }
+
+
+    return date.toLocaleString(
+        "ru-RU"
+    );
+
+}
+
+
+/* =========================================================
+   MONEY RATE
+========================================================= */
+
+function moneyRate(
+    value
+){
+
+    return (
+
+        Number(value) || 0
+
+    ).toLocaleString(
+        "ru-RU",
+        {
+            minimumFractionDigits:4,
+            maximumFractionDigits:4
+        }
+
+    ) + " ₽";
+
+}
+
+
+/* =========================================================
+   JPY / 100
+========================================================= */
+
+function rateJPY100(
+    value
+){
+
+    return (
+
+        (Number(value) || 0) * 100
+
+    ).toLocaleString(
+        "ru-RU",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+
+    ) + " ₽ / 100";
+
+}
+
+
+/* =========================================================
+   KRW / 1000
+========================================================= */
+
+function rateKRW1000(
+    value
+){
+
+    return (
+
+        (Number(value) || 0) * 1000
+
+    ).toLocaleString(
+        "ru-RU",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+
+    ) + " ₽ / 1000";
+
+}
+
+
+/* =========================================================
+   UPDATE RATES UI
+========================================================= */
+
+function updateRatesUI(){
+
+
+    document.getElementById(
+        "rateUSD"
+    ).textContent =
+        moneyRate(
+            RATES.USD_SWIFT
+        );
+
+
+    document.getElementById(
+        "rateUSDID"
+    ).textContent =
+        moneyRate(
+            RATES.USD_IDUBID
+        );
+
+
+    document.getElementById(
+        "rateJPYSWIFT"
+    ).textContent =
+        rateJPY100(
+            RATES.JPY_SWIFT
+        );
+
+
+    document.getElementById(
+        "rateJPY"
+    ).textContent =
+        rateJPY100(
+            RATES.JPY_INTERNAL
+        );
+
+
+    document.getElementById(
+        "rateJPYCASH"
+    ).textContent =
+        rateJPY100(
+            RATES.JPY_CASH
+        );
+
+
+    document.getElementById(
+        "rateJPYQR"
+    ).textContent =
+        rateJPY100(
+            RATES.JPY_QR
+        );
+
+
+    document.getElementById(
+        "rateKRW"
+    ).textContent =
+        rateKRW1000(
+            RATES.KRW
+        );
+
+
+    document.getElementById(
+        "rateAED"
+    ).textContent =
+        moneyRate(
+            RATES.AED
+        );
+
+
+    document.getElementById(
+        "rateCNY"
+    ).textContent =
+        moneyRate(
+            RATES.CNY
+        );
+
+
+    document.getElementById(
+        "rateTHB"
+    ).textContent =
+        moneyRate(
+            RATES.THB
+        );
+
+}
+
+
+/* =========================================================
+   GET RATE
+========================================================= */
+
+function getRate(
+    currency
+){
+
+    if(currency === "RUB"){
+
+        return 1;
+
+    }
+
+
+    /*
+       Ручной USD имеет приоритет.
+    */
+
+    if(
+        currency === "USD_SWIFT"
+    ){
+
+        const manual =
+            Number(
+                document.getElementById(
+                    "manualUSD"
+                ).value
+            );
+
+
+        if(
+            Number.isFinite(manual) &&
+            manual > 0
+        ){
+
+            return manual;
+
+        }
+
+    }
+
+
+    return (
+        Number(
+            RATES[currency]
+        ) || 0
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE CURRENT CAR RATE
+========================================================= */
+
+function updateCarRate(){
+
+
+    const currency =
+        document.getElementById(
+            "priceCurrency"
+        ).value;
+
+
+    const rate =
+        getRate(currency);
+
+
+    const carRate =
+        document.getElementById(
+            "carRate"
+        );
+
+
+    const source =
+        document.getElementById(
+            "rateSource"
+        );
+
+
+    if(!rate){
+
+        carRate.textContent =
+            "—";
+
+        source.textContent =
+            "Источник: курс отсутствует";
+
+        return;
+
+    }
+
+
+    if(
+        currency.startsWith("JPY")
+    ){
+
+        carRate.textContent =
+            rateJPY100(rate);
+
+    }else if(
+        currency === "KRW"
+    ){
+
+        carRate.textContent =
+            rateKRW1000(rate);
+
+    }else{
+
+        carRate.textContent =
+            moneyRate(rate);
+
+    }
+
+
+    let sourceText =
+        ratesFromAPI
+            ? "Telegram / API"
+            : "Резерв";
+
+
+    if(
+        currency === "USD_SWIFT" &&
+        Number(
+            document.getElementById(
+                "manualUSD"
+            ).value
+        ) > 0
+    ){
+
+        sourceText =
+            "Вручную";
+
+    }
+
+
+    source.textContent =
+        "Источник: " +
+        sourceText +
+        " • " +
+        currency;
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+document
+    .getElementById(
+        "priceCurrency"
+    )
+    .addEventListener(
+        "change",
+        updateCarRate
+    );
+
+
+document
+    .getElementById(
+        "manualUSD"
+    )
+    .addEventListener(
+        "input",
+        updateCarRate
+    );
+
+
+/* =========================================================
+   CUSTOMS FEE
+========================================================= */
+
+function getCustomsFee(
+    priceRub
+){
+
+    if(priceRub <= 200000)
+        return 1231;
+
+    if(priceRub <= 450000)
+        return 2462;
+
+    if(priceRub <= 1200000)
+        return 4924;
+
+    if(priceRub <= 2700000)
+        return 13541;
+
+    if(priceRub <= 4200000)
+        return 18465;
+
+    if(priceRub <= 5500000)
+        return 21344;
+
+    if(priceRub <= 10000000)
+        return 49240;
+
+    return 73860;
+
+}
+
+
+/* =========================================================
+   PHYSICAL UNDER 3
+========================================================= */
+
+function dutyPhysUnder3(
+    priceEUR,
+    volume
+){
+
+    let percent;
+
+    let minPerCm;
+
+
+    if(priceEUR <= 8500){
+
+        percent = .54;
+        minPerCm = 2.5;
+
+    }else if(priceEUR <= 16700){
+
+        percent = .48;
+        minPerCm = 3.5;
+
+    }else if(priceEUR <= 42300){
+
+        percent = .48;
+        minPerCm = 5.5;
+
+    }else if(priceEUR <= 84500){
+
+        percent = .48;
+        minPerCm = 7.5;
+
+    }else if(priceEUR <= 169000){
+
+        percent = .48;
+        minPerCm = 15;
+
+    }else{
+
+        percent = .48;
+        minPerCm = 20;
+
+    }
+
+
+    return Math.max(
+        priceEUR * percent,
+        volume * minPerCm
+    );
+
+}
+
+
+/* =========================================================
+   PHYSICAL OLDER
+========================================================= */
+
+function dutyPhysOlder(
+    age,
+    volume
+){
+
+    const older =
+        age === "5_7" ||
+        age === "more_7";
+
+
+    let rate;
+
+
+    if(!older){
+
+        if(volume <= 1000)
+            rate = 1.5;
+
+        else if(volume <= 1500)
+            rate = 1.7;
+
+        else if(volume <= 1800)
+            rate = 2.5;
+
+        else if(volume <= 2300)
+            rate = 2.7;
+
+        else if(volume <= 3000)
+            rate = 3;
+
+        else
+            rate = 3.6;
+
+    }else{
+
+        if(volume <= 1000)
+            rate = 3;
+
+        else if(volume <= 1500)
+            rate = 3.2;
+
+        else if(volume <= 1800)
+            rate = 3.5;
+
+        else if(volume <= 2300)
+            rate = 4.8;
+
+        else if(volume <= 3000)
+            rate = 5;
+
+        else
+            rate = 5.7;
+
+    }
+
+
+    return volume * rate;
+
+}
+
+
+/* =========================================================
+   LEGAL PETROL / HYBRID
+========================================================= */
+
+function dutyLegalPetrol(
+    age,
+    volume,
+    priceEUR
+){
+
+    if(age === "less_3"){
+
+        const percent =
+            volume > 2800
+                ? .125
+                : .15;
+
+        return priceEUR * percent;
+
+    }
+
+
+    if(
+        age === "3_5" ||
+        age === "5_7"
+    ){
+
+        let min;
+
+
+        if(volume <= 1000)
+            min = .36;
+
+        else if(volume <= 1500)
+            min = .40;
+
+        else if(volume <= 1800)
+            min = .36;
+
+        else if(volume <= 2300)
+            min = .44;
+
+        else if(volume <= 2800)
+            min = .44;
+
+        else if(volume <= 3000)
+            min = .44;
+
+        else
+            min = .80;
+
+
+        return Math.max(
+            priceEUR * .20,
+            volume * min
+        );
+
+    }
+
+
+    let rate;
+
+
+    if(volume <= 1000)
+        rate = 1.4;
+
+    else if(volume <= 1500)
+        rate = 1.5;
+
+    else if(volume <= 1800)
+        rate = 1.6;
+
+    else if(volume <= 2300)
+        rate = 2.2;
+
+    else if(volume <= 3000)
+        rate = 2.2;
+
+    else
+        rate = 3.2;
+
+
+    return volume * rate;
+
+}
+
+
+/* =========================================================
+   DIESEL
+========================================================= */
+
+function dutyLegalDiesel(
+    age,
+    volume,
+    priceEUR
+){
+
+    if(age === "less_3"){
+
+        return priceEUR * .15;
+
+    }
+
+
+    if(
+        age === "3_5" ||
+        age === "5_7"
+    ){
+
+        let min;
+
+
+        if(volume <= 1500)
+            min = .32;
+
+        else if(volume <= 2500)
+            min = .40;
+
+        else
+            min = .80;
+
+
+        return Math.max(
+            priceEUR * .20,
+            volume * min
+        );
+
+    }
+
+
+    let rate;
+
+
+    if(volume <= 1500)
+        rate = 1.5;
+
+    else if(volume <= 2500)
+        rate = 2.2;
+
+    else
+        rate = 3.2;
+
+
+    return volume * rate;
+
+}
+
+
+/* =========================================================
+   CUSTOMS DUTY
+========================================================= */
+
+function getCustomsDuty({
+    owner,
+    age,
+    engine,
+    volume,
+    priceEUR
+}){
+
+
+    if(engine === "ev"){
+
+        return priceEUR * .15;
+
+    }
+
+
+    if(owner === "phys"){
+
+        if(age === "less_3"){
+
+            return dutyPhysUnder3(
+                priceEUR,
+                volume
+            );
+
+        }
+
+
+        return dutyPhysOlder(
+            age,
+            volume
+        );
+
+    }
+
+
+    if(engine === "diesel"){
+
+        return dutyLegalDiesel(
+            age,
+            volume,
+            priceEUR
+        );
+
+    }
+
+
+    return dutyLegalPetrol(
+        age,
+        volume,
+        priceEUR
+    );
+
+}
+
+
+/* =========================================================
+   EXCISE
+========================================================= */
+
+function getExcise(
+    power,
+    owner,
+    engine
+){
+
+    /*
+       Акциз только для юридических лиц.
+    */
+
+    if(owner !== "legal"){
+
+        return 0;
+
+    }
+
+
+    /*
+       Для электромобиля ДВС-акциз не применяем.
+    */
+
+    if(engine === "ev"){
+
+        return 0;
+
+    }
+
+
+    if(power <= 90)
+        return 0;
+
+    if(power <= 150)
+        return power * 64;
+
+    if(power <= 200)
+        return power * 613;
+
+    if(power <= 300)
+        return power * 1004;
+
+    if(power <= 400)
+        return power * 1711;
+
+    if(power <= 500)
+        return power * 1771;
+
+    return power * 1829;
+
+}
+
+
+/* =========================================================
+   VAT
+========================================================= */
+
+function getVAT(
+    priceRub,
+    dutyRub,
+    excise,
+    owner
+){
+
+    if(owner !== "legal"){
+
+        return 0;
+
+    }
+
+
+    return (
+        priceRub +
+        dutyRub +
+        excise
+    ) * .20;
+
+}
+
+
+/* =========================================================
+   UTILIZATION
+========================================================= */
+
+function getUtilizationFee({
+
+    owner,
+    age,
+    engine,
+    power,
+    volume
+
+}){
+
+
+    const base =
+        owner === "legal"
+            ? 150000
+            : 20000;
+
+
+    if(owner === "phys"){
+
+        let loyalty =
+            false;
+
+
+        if(engine === "ev"){
+
+            if(power <= 80){
+
+                loyalty = true;
+
+            }
+
+        }else{
+
+            if(
+                volume <= 3000 &&
+                power <= 160
+            ){
+
+                loyalty = true;
+
+            }
+
+        }
+
+
+        if(loyalty){
+
+            const coefficient =
+                age === "less_3" ||
+                age === "3_5"
+                    ? .17
+                    : .26;
+
+
+            return base * coefficient;
+
+        }
+
+    }
+
+
+    let coefficient;
+
+
+    if(engine === "ev"){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 9.12
+                : 10.10;
+
+    }else if(power <= 160){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 9.12
+                : 10.10;
+
+    }else if(power <= 200){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 17.42
+                : 20.96;
+
+    }else if(power <= 300){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 26.87
+                : 30.28;
+
+    }else if(power <= 400){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 33.14
+                : 45.64;
+
+    }else if(power <= 500){
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 39.69
+                : 50.55;
+
+    }else{
+
+        coefficient =
+            age === "less_3" ||
+            age === "3_5"
+                ? 54.90
+                : 96.08;
+
+    }
+
+
+    return base * coefficient;
+
+}
+
+
+/* =========================================================
+   EXPENSE
+========================================================= */
+
+function getExpense(
+    amountId,
+    currencyId
+){
+
+    const amount =
+        Number(
+            document.getElementById(
+                amountId
+            ).value
+        ) || 0;
+
+
+    const currency =
+        document.getElementById(
+            currencyId
+        ).value;
+
+
+    const rate =
+        getRate(currency);
+
+
+    return amount * rate;
+
+}
+
+
+/* =========================================================
+   CALCULATE
+========================================================= */
+
+function calculate(){
+
+
+    const price =
+        Number(
+            document.getElementById(
+                "price"
+            ).value
+        ) || 0;
+
+
+    const volume =
+        Number(
+            document.getElementById(
+                "volume"
+            ).value
+        ) || 0;
+
+
+    const power =
+        Number(
+            document.getElementById(
+                "power"
+            ).value
+        ) || 0;
+
+
+    const owner =
+        document.getElementById(
+            "ownerType"
+        ).value;
+
+
+    const age =
+        document.getElementById(
+            "ageGroup"
+        ).value;
+
+
+    const engine =
+        document.getElementById(
+            "engineType"
+        ).value;
+
+
+    /*
+       Курс EUR для таможенного расчёта.
+    */
+
+    const eurRate =
+        96.8601;
+
+
+    const currency =
+        document.getElementById(
+            "priceCurrency"
+        ).value;
+
+
+    const classic =
+        document.getElementById(
+            "classic"
+        ).value === "yes";
+
+
+    const results =
+        document.getElementById(
+            "results"
+        );
+
+
+    const errorBox =
+        document.getElementById(
+            "errorBox"
+        );
+
+
+    errorBox.innerHTML =
+        "";
+
+
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
+
+    if(price <= 0){
+
+        errorBox.innerHTML =
+            "Укажите стоимость автомобиля.";
+
+        results.classList.add(
+            "visible"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        engine !== "ev" &&
+        volume <= 0
+    ){
+
+        errorBox.innerHTML =
+            "Укажите объём двигателя.";
+
+        results.classList.add(
+            "visible"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        engine !== "ev" &&
+        power <= 0
+    ){
+
+        errorBox.innerHTML =
+            "Укажите мощность автомобиля.";
+
+        results.classList.add(
+            "visible"
+        );
+
+        return;
+
+    }
+
+
+    const carRate =
+        getRate(currency);
+
+
+    if(!carRate){
+
+        errorBox.innerHTML =
+            "Курс выбранной валюты не загружен.";
+
+        results.classList.add(
+            "visible"
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       PRICE
+    ===================================================== */
+
+    const priceRub =
+        price * carRate;
+
+
+    const priceEUR =
+        priceRub / eurRate;
+
+
+    /* =====================================================
+       DUTY
+    ===================================================== */
+
+    const dutyEUR =
+        getCustomsDuty({
+
+            owner,
+            age,
+            engine,
+            volume,
+            priceEUR
+
+        });
+
+
+    const dutyRub =
+        dutyEUR * eurRate;
+
+
+    /* =====================================================
+       CUSTOMS FEE
+    ===================================================== */
+
+    const customsFee =
+        getCustomsFee(
+            priceRub
+        );
+
+
+    /* =====================================================
+       EXCISE
+    ===================================================== */
+
+    const excise =
+        getExcise(
+            power,
+            owner,
+            engine
+        );
+
+
+    /* =====================================================
+       VAT
+    ===================================================== */
+
+    const vat =
+        getVAT(
+            priceRub,
+            dutyRub,
+            excise,
+            owner
+        );
+
+
+    /* =====================================================
+       UTILIZATION
+    ===================================================== */
+
+    let utilization =
+        getUtilizationFee({
+
+            owner,
+            age,
+            engine,
+            power,
+            volume
+
+        });
+
+
+    if(classic){
+
+        utilization = 0;
+
+    }
+
+
+    /* =====================================================
+       EXPENSES
+    ===================================================== */
+
+    const commission =
+        getExpense(
+            "commission",
+            "commissionCurrency"
+        );
+
+
+    const freight =
+        getExpense(
+            "freight",
+            "freightCurrency"
+        );
+
+
+    const svh =
+        getExpense(
+            "svh",
+            "svhCurrency"
+        );
+
+
+    /* =====================================================
+       TOTAL
+    ===================================================== */
+
+    const customsTotal =
+        customsFee +
+        dutyRub +
+        excise +
+        vat +
+        utilization;
+
+
+    const total =
+        priceRub +
+        customsTotal +
+        commission +
+        freight +
+        svh;
+
+
+    /* =====================================================
+       OUTPUT
+    ===================================================== */
+
+    document.getElementById(
+        "total"
+    ).textContent =
+        rub(total);
+
+
+    const details =
+        document.getElementById(
+            "details"
+        );
+
+
+    details.innerHTML =
+        "";
+
+
+    addDetail(
+        "Цена автомобиля",
+        priceRub
+    );
+
+
+    addDetail(
+        "Цена автомобиля в EUR",
+        priceEUR,
+        true
+    );
+
+
+    addDetail(
+        "Таможенный сбор",
+        customsFee
+    );
+
+
+    addDetail(
+        "Таможенная пошлина",
+        dutyRub
+    );
+
+
+    addDetail(
+        "Утилизационный сбор",
+        utilization
+    );
+
+
+    if(owner === "legal"){
+
+        addDetail(
+            "Акциз",
+            excise
+        );
+
+
+        addDetail(
+            "НДС 20%",
+            vat
+        );
+
+    }
+
+
+    details.innerHTML +=
+        '<div class="section">' +
+        'Дополнительные расходы' +
+        '</div>';
+
+
+    addDetail(
+        "Фрахт",
+        freight
+    );
+
+
+    addDetail(
+        "Комиссия компании",
+        commission
+    );
+
+
+    addDetail(
+        "СВХ и брокер",
+        svh
+    );
+
+
+    details.innerHTML +=
+        '<div class="section">' +
+        'Итог' +
+        '</div>';
+
+
+    addDetail(
+        "Всего растаможка",
+        customsTotal
+    );
+
+
+    addDetail(
+        "Автомобиль + растаможка + расходы",
+        total
+    );
+
+
+    results.classList.add(
+        "visible"
+    );
+
+
+    results.scrollIntoView({
+
+        behavior:"smooth",
+
+        block:"start"
+
+    });
+
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+function addDetail(
+    name,
+    value,
+    euro = false
+){
+
+    const details =
+        document.getElementById(
+            "details"
+        );
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "detail";
+
+
+    div.innerHTML = `
+
+        <span class="detail-name">
+
+            ${escapeHtml(name)}
+
+        </span>
+
+
+        <span class="detail-value">
+
+            ${
+                euro
+                    ? number(value) + " €"
+                    : rub(value)
+            }
+
+        </span>
+
+    `;
+
+
+    details.appendChild(
+        div
+    );
+
+}
+
+
+/* =========================================================
+   RUB
+========================================================= */
+
+function rub(
+    value
+){
+
+    return (
+
+        Number(value) || 0
+
+    ).toLocaleString(
+
+        "ru-RU",
+
+        {
+            maximumFractionDigits:0
+        }
+
+    ) + " ₽";
+
+}
+
+
+/* =========================================================
+   NUMBER
+========================================================= */
+
+function number(
+    value
+){
+
+    return (
+
+        Number(value) || 0
+
+    ).toLocaleString(
+
+        "ru-RU",
+
+        {
+            maximumFractionDigits:2
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+){
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+
+        /*
+           Сначала показываем резервные значения.
+        */
+
+        updateRatesUI();
+
+        updateCarRate();
+
+
+        /*
+           СРАЗУ запрашиваем настоящий API.
+        */
+
+        await loadTelegramRates();
+
+
+        /*
+           Далее обновляем каждые 10 минут.
+        */
+
+        setInterval(
+
+            loadTelegramRates,
+
+            10 * 60 * 1000
+
+        );
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>
