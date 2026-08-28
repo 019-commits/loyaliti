@@ -1,0 +1,20 @@
+{
+  "name": "loyalty-swift-rates",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Read exchange-rate cards from a public Telegram channel preview, OCR them, and expose a JSON API.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node scripts/test-parser.js"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cheerio": "^1.1.2",
+    "express": "^4.21.2",
+    "sharp": "^0.34.3"
+  }
+}

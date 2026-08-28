@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: loyalty-swift-rates
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: TELEGRAM_CHANNEL
+        value: LoyaltySwift
+      - key: POLL_INTERVAL_MS
+        value: '600000'
+      - key: REQUEST_TIMEOUT_MS
+        value: '60000'
+      - key: TELEGRAM_MAX_PAGES
+        value: '3'
