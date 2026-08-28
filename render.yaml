@@ -11,6 +11,6 @@ services:
       - key: POLL_INTERVAL_MS
         value: '600000'
       - key: REQUEST_TIMEOUT_MS
-        value: '60000'
+        value: '120000'
       - key: TELEGRAM_MAX_PAGES
         value: '3'
