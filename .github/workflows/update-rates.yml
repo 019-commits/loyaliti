@@ -1,0 +1,15 @@
+name: Update Telegram rates
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render updater
+        env:
+          RATE_API_URL: https://loyalty-swift-1.onrender.com/api/update
+        run: curl -fsS -X POST "$RATE_API_URL" -H 'Accept: application/json' --max-time 120
